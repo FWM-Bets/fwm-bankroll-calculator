@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FWM Bets – Bankroll Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg-main: #050505;
+      --bg-card: #0A0A0A;
+      --accent: #00FF85;
+      --accent-soft: rgba(0, 255, 133, 0.12);
+      --text-main: #f9f9f9;
+      --text-muted: #a0a0a0;
+      --border-subtle: #1b1b1b;
+      --danger: #ff4d4f;
+      --warning: #ffc53d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #151515 0, #050505 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px 12px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 960px;
+      background: rgba(5, 5, 5, 0.95);
+      border-radius: 20px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
+      padding: 24px 18px 20px;
+    }
+
+    @media (min-width: 768px) {
+      .app {
+        padding: 28px 28px 24px;
+        border-radius: 24px;
+      }
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .brand {
+      font-size: 14px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 650;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-live {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 255, 133, 0.4);
+      background: rgba(0, 255, 133, 0.05);
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .cta-chip {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--accent-soft);
+      background: linear-gradient(135deg, rgba(0, 255, 133, 0.08), transparent);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .cta-chip span.icon {
+      font-size: 14px;
+    }
+
+    /* FORM SECTION */
+    .section {
+      background: var(--bg-card);
+      border-radius: 18px;
+      border: 1px solid var(--border-subtle);
+      padding: 16px 16px 14px;
+      margin-bottom: 14px;
+    }
+
+    @media (min-width: 768px) {
+      .section {
+        border-radius: 20px;
+        padding: 18px 18px 16px;
+        margin-bottom: 16px;
+      }
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+    }
+
+    .section-caption {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    label {
+      font-size: 13px;
+      margin-bottom: 6px;
+      display: inline-block;
+      color: var(--text-muted);
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .input-prefix {
+      font-size: 15px;
+      color: var(--accent);
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(0, 255, 133, 0.06);
+      border: 1px solid rgba(0, 255, 133, 0.35);
+    }
+
+    input[type="number"] {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: #050505;
+      padding: 9px 10px;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::placeholder {
+      color: #555;
+    }
+
+    input[type="number"]:focus {
+      border-color: rgba(0, 255, 133, 0.7);
+      box-shadow: 0 0 0 1px rgba(0, 255, 133, 0.25);
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* BET SUGGESTIONS */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .cards-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .bet-card {
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      background: linear-gradient(145deg, #050505, #101010);
+      padding: 10px 11px 9px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bet-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(0, 255, 133, 0.14), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .bet-card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .bet-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .bet-label .tag {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 255, 133, 0.2);
+      background: rgba(0, 255, 133, 0.04);
+      color: var(--accent);
+    }
+
+    .bet-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .bet-amount {
+      font-size: 20px;
+      font-weight: 650;
+      margin-bottom: 2px;
+    }
+
+    .bet-percent {
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .bet-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* PLANNER */
+    .planner-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .planner-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .planner-item {
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      padding: 8px 9px 7px;
+      background: #050505;
+    }
+
+    .planner-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .planner-label strong {
+      color: var(--text-main);
+    }
+
+    .planner-item input[type="number"] {
+      padding: 6px 8px;
+      font-size: 13px;
+    }
+
+    .summary-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: baseline;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .summary-main span.value {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .summary-badge {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border: 1px solid transparent;
+    }
+
+    .summary-badge.safe {
+      color: var(--accent);
+      border-color: rgba(0, 255, 133, 0.5);
+      background: rgba(0, 255, 133, 0.06);
+    }
+
+    .summary-badge.warn {
+      color: var(--warning);
+      border-color: rgba(255, 197, 61, 0.6);
+      background: rgba(255, 197, 61, 0.08);
+    }
+
+    .summary-badge.danger {
+      color: var(--danger);
+      border-color: rgba(255, 77, 79, 0.6);
+      background: rgba(255, 77, 79, 0.08);
+    }
+
+    /* NOTES */
+    .notes {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .notes-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+
+    .notes ul {
+      list-style: none;
+      margin: 0 0 6px 0;
+      padding: 0;
+    }
+
+    .notes li {
+      margin-bottom: 4px;
+    }
+
+    .notes strong {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .disclaimer {
+      margin-top: 4px;
+      font-size: 10px;
+      opacity: 0.85;
+    }
+
+    /* FOOTER */
+    .footer {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      background: rgba(0, 255, 133, 0.08);
+      color: var(--accent);
+      font-size: 12px;
+      padding: 7px 11px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease-out;
+    }
+
+    button:hover {
+      background: rgba(0, 255, 133, 0.16);
+      transform: translateY(-0.5px);
+      box-shadow: 0 0 0 1px rgba(0, 255, 133, 0.25);
+    }
+
+    button.secondary {
+      border-color: var(--border-subtle);
+      background: #050505;
+      color: var(--text-main);
+    }
+
+    a.link {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a.link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- HEADER -->
+    <div class="header">
+      <div class="title-group">
+        <div class="brand">FWM Bets</div>
+        <h1>
+          Bankroll Strategy Calculator
+          <span class="badge-live">v1 • beta</span>
+        </h1>
+        <div class="subtitle">
+          Turn your bankroll into structured <span style="color: var(--accent);">Max / Regular / Light</span> bet sizes.
+        </div>
+      </div>
+      <div class="cta-chip" onclick="window.open('https://discord.com', '_blank')">
+        <span class="icon">💬</span>
+        <span>Join FWM Discord</span>
+      </div>
+    </div>
+
+    <!-- BANKROLL INPUT -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">1. Bankroll Input</div>
+        <div class="section-caption">Set your current active bankroll (not your whole net worth).</div>
+      </div>
+
+      <label for="bankroll">Current Bankroll</label>
+      <div class="input-row">
+        <div class="input-prefix">$</div>
+        <input
+          id="bankroll"
+          type="number"
+          min="0"
+          step="1"
+          placeholder="Enter amount (e.g. 100, 250, 500)"
+        />
+      </div>
+    </div>
+
+    <!-- BET SIZES -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">2. Suggested Bet Sizes</div>
+        <div class="section-caption">Auto-calculated as a % of your bankroll.</div>
+      </div>
+
+      <div class="cards-grid">
+        <!-- Light Play -->
+        <div class="bet-card">
+          <div class="bet-card-inner">
+            <div class="bet-label">
+              <span>Light Play / Bet</span>
+              <span class="tag">entry</span>
+            </div>
+            <div class="bet-name">Light Play</div>
+            <div class="bet-amount" id="light-amount">$0.00</div>
+            <div class="bet-percent">≈ 5% of bankroll</div>
+            <div class="bet-note">
+              A smaller, low-risk bet. Recommended when you like the angle,
+              but don't want heavy exposure.
+            </div>
+          </div>
+        </div>
+
+        <!-- Regular Play -->
+        <div class="bet-card">
+          <div class="bet-card-inner">
+            <div class="bet-label">
+              <span>Regular Play / Bet</span>
+              <span class="tag">standard</span>
+            </div>
+            <div class="bet-name">Regular Play</div>
+            <div class="bet-amount" id="regular-amount">$0.00</div>
+            <div class="bet-percent">≈ 10% of bankroll</div>
+            <div class="bet-note">
+              Your normal stake size. Used when you have solid conviction
+              and good data backing the prop.
+            </div>
+          </div>
+        </div>
+
+        <!-- Max Play -->
+        <div class="bet-card">
+          <div class="bet-card-inner">
+            <div class="bet-label">
+              <span>Max Play / Bet</span>
+              <span class="tag">high conviction</span>
+            </div>
+            <div class="bet-name">Max Play</div>
+            <div class="bet-amount" id="max-amount">$0.00</div>
+            <div class="bet-percent">≈ 20% of bankroll</div>
+            <div class="bet-note">
+              Reserved for your strongest edges. Use sparingly to avoid
+              overexposing your bankroll.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAY PLANNER -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">3. Daily Play Planner (Optional)</div>
+        <div class="section-caption">Plan your exposure across Light / Regular / Max plays.</div>
+      </div>
+
+      <div class="planner-grid">
+        <div class="planner-item">
+          <div class="planner-label">
+            <strong>Light Plays</strong> (≈ 5% each)
+          </div>
+          <input id="num-light" type="number" min="0" step="1" value="0" />
+        </div>
+        <div class="planner-item">
+          <div class="planner-label">
+            <strong>Regular Plays</strong> (≈ 10% each)
+          </div>
+          <input id="num-regular" type="number" min="0" step="1" value="0" />
+        </div>
+        <div class="planner-item">
+          <div class="planner-label">
+            <strong>Max Plays</strong> (≈ 20% each)
+          </div>
+          <input id="num-max" type="number" min="0" step="1" value="0" />
+        </div>
+      </div>
+
+      <div class="summary-row">
+        <div class="summary-main">
+          Planned total exposure:
+          <span class="value" id="total-exposure">$0.00 (0.0%)</span>
+        </div>
+        <div class="summary-badge safe" id="exposure-status">
+          ✅ Within safe range
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="section">
+      <div class="notes">
+        <div class="notes-title">4. Notes & Definitions</div>
+        <ul>
+          <li>
+            <strong>Max Play / Bet</strong> – A bet that is recommended to be
+            at least <strong>20% of your bankroll</strong> for your highest
+            conviction spots. Use carefully.
+          </li>
+          <li>
+            <strong>Regular Play / Bet</strong> – A bet that is recommended to
+            be at least <strong>10% of your bankroll</strong>. This is your
+            “standard” stake.
+          </li>
+          <li>
+            <strong>Light Play / Bet</strong> – A bet that is recommended to be
+            at least <strong>5% of your bankroll</strong> for lower-conviction
+            or “feeler” spots.
+          </li>
+        </ul>
+        <div class="disclaimer">
+          This tool is for educational & entertainment purposes only. Betting
+          always involves risk. Never wager money you cannot afford to lose.
+          Percentages and suggestions are guidelines — not financial advice.
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div>© <span id="year"></span> FWM Bets • Bankroll Strategy</div>
+      <div class="btn-row">
+        <button type="button" onclick="copyLink()">
+          🔗 Share Calculator
+        </button>
+        <button
+          type="button"
+          class="secondary"
+          onclick="window.open('https://fwm-bets.github.io', '_blank')"
+        >
+          📊 View FWM Tools
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const bankrollInput = document.getElementById('bankroll');
+    const lightAmountEl = document.getElementById('light-amount');
+    const regularAmountEl = document.getElementById('regular-amount');
+    const maxAmountEl = document.getElementById('max-amount');
+
+    const numLight = document.getElementById('num-light');
+    const numRegular = document.getElementById('num-regular');
+    const numMax = document.getElementById('num-max');
+
+    const totalExposureEl = document.getElementById('total-exposure');
+    const exposureStatusEl = document.getElementById('exposure-status');
+
+    const BANKROLL_DEFAULT = 100;
+
+    function parseBankroll() {
+      const val = parseFloat(bankrollInput.value);
+      return isNaN(val) || val < 0 ? 0 : val;
+    }
+
+    function fmtCurrency(x) {
+      return '$' + x.toFixed(2);
+    }
+
+    function fmtPercent(x) {
+      return x.toFixed(1) + '%';
+    }
+
+    function updateBetSizes() {
+      const bankroll = parseBankroll();
+
+      const light = bankroll * 0.05;
+      const regular = bankroll * 0.10;
+      const max = bankroll * 0.20;
+
+      lightAmountEl.textContent = fmtCurrency(light);
+      regularAmountEl.textContent = fmtCurrency(regular);
+      maxAmountEl.textContent = fmtCurrency(max);
+
+      // Also refresh planner summary
+      updatePlannerSummary();
+    }
+
+    function updatePlannerSummary() {
+      const bankroll = parseBankroll();
+      if (bankroll <= 0) {
+        totalExposureEl.textContent = '$0.00 (0.0%)';
+        exposureStatusEl.textContent = 'Enter a bankroll to see exposure.';
+        exposureStatusEl.className = 'summary-badge warn';
+        return;
+      }
+
+      const lightCount = parseInt(numLight.value || '0', 10);
+      const regularCount = parseInt(numRegular.value || '0', 10);
+      const maxCount = parseInt(numMax.value || '0', 10);
+
+      const lightStake = bankroll * 0.05;
+      const regularStake = bankroll * 0.10;
+      const maxStake = bankroll * 0.20;
+
+      const totalRisk =
+        lightCount * lightStake +
+        regularCount * regularStake +
+        maxCount * maxStake;
+
+      const pct = (totalRisk / bankroll) * 100;
+
+      totalExposureEl.textContent =
+        fmtCurrency(totalRisk) + ' (' + fmtPercent(isNaN(pct) ? 0 : pct) + ')';
+
+      // Status badge logic
+      exposureStatusEl.classList.remove('safe', 'warn', 'danger');
+
+      if (pct <= 35) {
+        exposureStatusEl.textContent = '✅ Within safe range';
+        exposureStatusEl.classList.add('safe');
+      } else if (pct <= 75) {
+        exposureStatusEl.textContent = '⚠️ Elevated risk – size down if needed';
+        exposureStatusEl.classList.add('warn');
+      } else {
+        exposureStatusEl.textContent =
+          '🚨 Very high exposure – reconsider number of plays';
+        exposureStatusEl.classList.add('danger');
+      }
+    }
+
+    function copyLink() {
+      const url = window.location.href;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(
+          () => {
+            alert('Link copied! Share this bankroll calculator with your squad.');
+          },
+          () => {
+            alert('Could not copy link. You can still share the page URL manually.');
+          }
+        );
+      } else {
+        // Fallback
+        alert('Copy not supported in this browser. Share the page URL manually.');
+      }
+    }
+
+    // Event listeners
+    bankrollInput.addEventListener('input', updateBetSizes);
+    numLight.addEventListener('input', updatePlannerSummary);
+    numRegular.addEventListener('input', updatePlannerSummary);
+    numMax.addEventListener('input', updatePlannerSummary);
+
+    // Init
+    document.getElementById('year').textContent = new Date().getFullYear();
+    // Give them a default bankroll hint
+    bankrollInput.value = BANKROLL_DEFAULT;
+    updateBetSizes();
+  </script>
+</body>
+</html>
