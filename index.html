@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>FWM Bets – Bankroll Calculator</title>
+  <link rel="icon" type="image/png" href="fwm_bets_logo_favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
@@ -453,22 +454,24 @@
 <body>
   <div class="app">
     <!-- HEADER -->
-    <div class="header">
-      <div class="title-group">
-        <div class="brand">FWM Bets</div>
-        <h1>
-          Bankroll Strategy Calculator
-          <span class="badge-live">v1 • beta</span>
-        </h1>
-        <div class="subtitle">
-          Turn your bankroll into structured <span style="color: var(--accent);">Max / Regular / Light</span> bet sizes.
-        </div>
-      </div>
-      <div class="cta-chip" onclick="window.open('https://discord.com', '_blank')">
-        <span class="icon">💬</span>
-        <span>Join FWM Discord</span>
-      </div>
-    </div>
+<div class="header">
+  <img src="fwm_bets_logo_transparent.png" alt="FWM Bets Logo" style="height:40px; width:auto;">
+
+  <div class="cta-chip" onclick="window.open('https://whop.com/fwm-bets/', '_blank')">
+    <span class="icon">👾</span>
+    <span>Join for FREE Access</span>
+  </div>
+</div>
+
+<div class="title-group" style="margin-top:10px;">
+  <h1>
+    Bankroll Strategy Calculator
+    <span class="badge-live">v1 • beta</span>
+  </h1>
+  <div class="subtitle">
+    Turn your bankroll into structured <span style="color: var(--accent);">Max / Regular / Light</span> bet sizes.
+  </div>
+</div>
 
     <!-- BANKROLL INPUT -->
     <div class="section">
@@ -618,24 +621,6 @@
         </div>
       </div>
     </div>
-
-    <!-- FOOTER -->
-    <div class="footer">
-      <div>© <span id="year"></span> FWM Bets • Bankroll Strategy</div>
-      <div class="btn-row">
-        <button type="button" onclick="copyLink()">
-          🔗 Share Calculator
-        </button>
-        <button
-          type="button"
-          class="secondary"
-          onclick="window.open('https://fwm-bets.github.io', '_blank')"
-        >
-          📊 View FWM Tools
-        </button>
-      </div>
-    </div>
-  </div>
 
   <script>
     const bankrollInput = document.getElementById('bankroll');
