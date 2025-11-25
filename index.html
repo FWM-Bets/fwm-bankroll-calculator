@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FWM Bankroll Calculator</title>
+
+    <style>
+        body {
+            background-color: #0A0A0A;
+            color: #00FF85;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 450px;
+            margin: auto;
+            background: #111;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 255, 133, 0.3);
+        }
+        input, button {
+            width: 90%;
+            padding: 12px;
+            font-size: 18px;
+            margin: 10px auto;
+            border-radius: 10px;
+        }
+        button {
+            background: #00FF85;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        h1 {
+            font-size: 26px;
+            margin-bottom: 15px;
+        }
+        .output {
+            margin-top: 20px;
+            background: #0f0f0f;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📊 FWM Bankroll Calculator</h1>
+
+        <input type="number" id="bankroll" placeholder="Enter Bankroll Amount ($)">
+
+        <button onclick="calculateBet('max')">🔥 Max Play</button>
+        <button onclick="calculateBet('regular')">⚖️ Regular Play</button>
+        <button onclick="calculateBet('light')">🛡 Light Play</button>
+
+        <div id="output" class="output"></div>
+    </div>
+
+
+<script>
+    function calculateBet(type) {
+        const bankroll = parseFloat(document.getElementById('bankroll').value);
+        if (isNaN(bankroll) || bankroll <= 0) {
+            document.getElementById('output').innerHTML = "Please enter a valid bankroll amount.";
+            return;
+        }
+
+        let percent = 0;
+        if (type === 'max') percent = 0.20;
+        if (type === 'regular') percent = 0.10;
+        if (type === 'light') percent = 0.05;
+
+        const betSize = (bankroll * percent).toFixed(2);
+        document.getElementById('output').innerHTML =
+            `Recommended Bet Size: <strong>$${betSize}</strong>`;
+    }
+</script>
+
+</body>
+</html>
