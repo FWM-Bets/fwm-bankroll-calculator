@@ -6,14 +6,14 @@
   <link rel="icon" type="image/png" href="fwm_bets_logo_favicon.png" />
   
   <!-- Mobile Home Screen Icons -->
-<link rel="apple-touch-icon" sizes="180x180" href="fwm_bets_logo_favicon.png">
-<link rel="apple-touch-icon" sizes="152x152" href="fwm_bets_logo_favicon.png">
-<link rel="apple-touch-icon" sizes="120x120" href="fwm_bets_logo_favicon.png">
-<link rel="apple-touch-icon" sizes="76x76" href="fwm_bets_logo_favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="fwm_bets_logo_favicon.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="fwm_bets_logo_favicon.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="fwm_bets_logo_favicon.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="fwm_bets_logo_favicon.png">
 
-<!-- Android Chrome App Icon -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00FF85">
+  <!-- Android Chrome App Icon -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00FF85">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -31,10 +31,10 @@
     }
 
     .brand-logo {
-  height: 100px;
-  width: auto;
-  display: block;
-}
+      height: 100px;
+      width: auto;
+      display: block;
+    }
 
     * {
       box-sizing: border-box;
@@ -378,6 +378,35 @@
       background: rgba(255, 77, 79, 0.08);
     }
 
+    /* NEW: Wrap badge + reset button */
+    .summary-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* NEW: Reset button styled like badge */
+    .summary-reset-btn {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 255, 133, 0.5);
+      background: rgba(0, 255, 133, 0.06);
+      color: var(--accent);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .summary-reset-btn:hover {
+      background: rgba(0, 255, 133, 0.14);
+      box-shadow: 0 0 0 1px rgba(0, 255, 133, 0.25);
+    }
+
     /* NOTES */
     .notes {
       font-size: 11px;
@@ -471,24 +500,24 @@
 <body>
   <div class="app">
     <!-- HEADER -->
-<div class="header">
-  <img class="brand-logo" src="fwm_bets_logo_transparent.png" alt="FWM Bets Logo" />
+    <div class="header">
+      <img class="brand-logo" src="fwm_bets_logo_transparent.png" alt="FWM Bets Logo" />
 
-  <div class="cta-chip" onclick="window.open('https://whop.com/fwm-bets/', '_blank')">
-    <span class="icon">👾</span>
-    <span>Join for FREE Access</span>
-  </div>
-</div>
+      <div class="cta-chip" onclick="window.open('https://whop.com/fwm-bets/', '_blank')">
+        <span class="icon">👾</span>
+        <span>Join for FREE Access</span>
+      </div>
+    </div>
 
-<div class="title-group" style="margin-top:10px;">
-  <h1>
-    Bankroll Strategy Calculator
-    <span class="badge-live">v1 • beta</span>
-  </h1>
-  <div class="subtitle">
-    Turn your bankroll into structured <span style="color: var(--accent);">Max / Regular / Light</span> bet sizes.
-  </div>
-</div>
+    <div class="title-group" style="margin-top:10px;">
+      <h1>
+        Bankroll Strategy Calculator
+        <span class="badge-live">v1 • beta</span>
+      </h1>
+      <div class="subtitle">
+        Turn your bankroll into structured <span style="color: var(--accent);">Max / Regular / Light</span> bet sizes.
+      </div>
+    </div>
 
     <!-- BANKROLL INPUT -->
     <div class="section">
@@ -604,8 +633,15 @@
           Planned total exposure:
           <span class="value" id="total-exposure">$0.00 (0.0%)</span>
         </div>
-        <div class="summary-badge safe" id="exposure-status">
-          ✅ Within safe range
+
+        <!-- NEW: badge + reset button group -->
+        <div class="summary-actions">
+          <div class="summary-badge safe" id="exposure-status">
+            ✅ Within safe range
+          </div>
+          <button type="button" class="summary-reset-btn" onclick="resetCalculator()">
+            ↺ Reset
+          </button>
         </div>
       </div>
     </div>
@@ -742,6 +778,15 @@
       }
     }
 
+    // NEW: full reset for all fields
+    function resetCalculator() {
+      bankrollInput.value = '';
+      numLight.value = '0';
+      numRegular.value = '0';
+      numMax.value = '0';
+      updateBetSizes(); // this will also refresh exposure/status
+    }
+
     // Event listeners
     bankrollInput.addEventListener('input', updateBetSizes);
     numLight.addEventListener('input', updatePlannerSummary);
@@ -749,8 +794,7 @@
     numMax.addEventListener('input', updatePlannerSummary);
 
     // Init
-    document.getElementById('year').textContent = new Date().getFullYear();
-    // Give them a default bankroll hint
+    // document.getElementById('year').textContent = new Date().getFullYear(); // (you can add a year span if you use this)
     bankrollInput.value = BANKROLL_DEFAULT;
     updateBetSizes();
   </script>
